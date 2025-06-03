@@ -3,106 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productivity MVP</title>
+    <title>Mindful Balance</title>
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --light: #f8f9fa;
-            --dark: #212529;
+            --morning-bg: #f0f7f4;
+            --morning-primary: #3a7d44;
+            --morning-secondary: #2a5e34;
+            --night-bg: #1a1a2e;
+            --night-primary: #e94560;
+            --night-secondary: #d13454;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--dark);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--morning-bg);
+            color: #333;
+            transition: all 0.3s ease;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f7fa;
+            min-height: 100vh;
         }
-        header {
-            text-align: center;
-            margin-bottom: 30px;
+        body.night-mode {
+            background-color: var(--night-bg);
+            color: #f0f0f0;
         }
         h1 {
-            color: var(--primary);
+            color: var(--morning-primary);
+            text-align: center;
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+        .night-mode h1 {
+            color: var(--night-primary);
+        }
+        .mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 100;
         }
         .tabs {
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         .tab {
-            padding: 10px 20px;
+            padding: 10px 15px;
             cursor: pointer;
             background: #eee;
-            margin-right: 5px;
-            border-radius: 5px 5px 0 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        .night-mode .tab {
+            background: #2d2d44;
+            color: white;
         }
         .tab.active {
-            background: var(--primary);
+            background: var(--morning-primary);
             color: white;
+        }
+        .night-mode .tab.active {
+            background: var(--night-primary);
         }
         .tab-content {
             display: none;
             padding: 20px;
-            background: white;
-            border-radius: 0 0 5px 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            margin-top: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .night-mode .tab-content {
+            background: rgba(30,30,46,0.9);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         .tab-content.active {
             display: block;
         }
-        input, button {
-            padding: 8px 12px;
+        input, textarea, button {
+            padding: 10px 15px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        .night-mode input, .night-mode textarea {
+            background: #2d2d44;
+            border-color: #444;
+            color: white;
         }
         button {
-            background-color: var(--primary);
+            background-color: var(--morning-primary);
             color: white;
             border: none;
             cursor: pointer;
-            margin-left: 5px;
+            transition: background 0.2s ease;
         }
         button:hover {
-            background-color: var(--secondary);
+            background-color: var(--morning-secondary);
+        }
+        .night-mode button {
+            background-color: var(--night-primary);
+        }
+        .night-mode button:hover {
+            background-color: var(--night-secondary);
         }
         ul {
             list-style: none;
             padding: 0;
+            margin: 20px 0 0;
         }
         li {
-            padding: 10px;
+            padding: 12px;
             border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+        .night-mode li {
+            border-bottom-color: #444;
+        }
         .delete-btn {
             background-color: #dc3545;
-            padding: 3px 6px;
-            font-size: 12px;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
         }
         .timer-display {
-            font-size: 3rem;
+            font-size: 3.5rem;
             text-align: center;
             margin: 20px 0;
+            font-weight: 200;
         }
         .timer-controls {
             display: flex;
             justify-content: center;
             gap: 10px;
+            margin-bottom: 20px;
+        }
+        .timer-mode {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+        }
+        .night-mode .timer-mode {
+            color: #aaa;
         }
         .habits-grid {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
+            grid-template-columns: 120px repeat(7, 1fr);
             gap: 5px;
+            margin-top: 20px;
         }
         .habit-header {
             font-weight: bold;
             text-align: center;
-            padding: 5px;
+            padding: 10px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        .night-mode .habit-header {
+            background: rgba(255,255,255,0.1);
         }
         .habit-day {
             aspect-ratio: 1;
@@ -111,79 +182,156 @@
             justify-content: center;
             background-color: #e9ecef;
             cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .night-mode .habit-day {
+            background-color: #2d2d44;
         }
         .habit-day.completed {
             background-color: #4cc9f0;
             color: white;
         }
+        .habit-day.today {
+            box-shadow: 0 0 0 2px var(--morning-primary);
+        }
+        .night-mode .habit-day.today {
+            box-shadow: 0 0 0 2px var(--night-primary);
+        }
+        .journal-entry {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 4px solid var(--morning-primary);
+            background: rgba(0,0,0,0.03);
+            border-radius: 0 8px 8px 0;
+        }
+        .night-mode .journal-entry {
+            border-left-color: var(--night-primary);
+            background: rgba(255,255,255,0.05);
+        }
+        .journal-date {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .journal-emotion {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        .emotion-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            margin-right: 10px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        .emotion-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        .night-mode .emotion-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .emotion-btn.selected {
+            transform: scale(1.2);
+        }
+        @media (max-width: 700px) {
+            .habits-grid {
+                grid-template-columns: 100px repeat(7, 1fr);
+                font-size: 0.9rem;
+            }
+        }
         @media (max-width: 600px) {
             .habits-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
+            .habit-name-header {
+                grid-column: 1 / span 4;
+                text-align: left;
+                padding-left: 20px;
+            }
         }
     </style>
 </head>
-<body>
-    <header>
-        <h1>Productivity MVP</h1>
-    </header>
-
+<body class="morning-mode">
+    <button class="mode-toggle" onclick="toggleMode()">🌙</button>
+    <h1>Mindful Balance</h1>
+    
     <div class="tabs">
-        <div class="tab active" onclick="openTab('todo')">To-Do</div>
-        <div class="tab" onclick="openTab('pomodoro')">Pomodoro</div>
-        <div class="tab" onclick="openTab('habits')">Habits</div>
+        <button class="tab active" onclick="openTab('intentions')">🌅 Daily Intentions</button>
+        <button class="tab" onclick="openTab('focus')">🧠 Focus Sessions</button>
+        <button class="tab" onclick="openTab('habits')">🌱 Habit Garden</button>
+        <button class="tab" onclick="openTab('journal')">✍️ Reflection Journal</button>
     </div>
 
-    <!-- Todo Tab -->
-    <div id="todo" class="tab-content active">
+    <!-- Intentions Tab -->
+    <div id="intentions" class="tab-content active">
         <div>
-            <input type="text" id="taskInput" placeholder="New task...">
-            <button onclick="addTask()">Add Task</button>
+            <input type="text" id="taskInput" placeholder="What's your intention today?">
+            <button onclick="addTask()">Add</button>
         </div>
         <ul id="taskList"></ul>
     </div>
 
-    <!-- Pomodoro Tab -->
-    <div id="pomodoro" class="tab-content">
+    <!-- Focus Tab -->
+    <div id="focus" class="tab-content">
         <div class="timer-display" id="timer">25:00</div>
         <div class="timer-controls">
             <button onclick="startTimer()">Start</button>
             <button onclick="pauseTimer()">Pause</button>
             <button onclick="resetTimer()">Reset</button>
         </div>
-        <p style="text-align: center; margin-top: 20px;">Current Mode: <span id="mode">Work</span></p>
+        <p class="timer-mode">Current Mode: <span id="mode">Work</span></p>
     </div>
 
     <!-- Habits Tab -->
     <div id="habits" class="tab-content">
-        <h3>Weekly Habits</h3>
+        <h3>Your Habit Garden</h3>
+        <p>Nurture your habits daily to see them grow</p>
         <div class="habits-grid" id="habitsGrid"></div>
+    </div>
+
+    <!-- Journal Tab -->
+    <div id="journal" class="tab-content">
+        <h3>Daily Reflection</h3>
+        <div id="journal-prompt">What are you grateful for today?</div>
+        <textarea id="journal-entry" rows="5" placeholder="Write your thoughts here..." style="width:100%; margin:10px 0;"></textarea>
+        <div style="margin: 15px 0;">
+            <span style="display: block; margin-bottom: 8px;">How do you feel?</span>
+            <button class="emotion-btn" onclick="setEmotion('happy')" id="happy-btn">😊</button>
+            <button class="emotion-btn" onclick="setEmotion('neutral')" id="neutral-btn">😐</button>
+            <button class="emotion-btn" onclick="setEmotion('sad')" id="sad-btn">😞</button>
+        </div>
+        <button onclick="saveJournalEntry()">Save Reflection</button>
+        <div id="past-entries" style="margin-top: 30px;"></div>
     </div>
 
     <script>
         // Tab System
         function openTab(tabName) {
-            const tabs = document.getElementsByClassName('tab');
-            const tabContents = document.getElementsByClassName('tab-content');
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
             
-            for (let tab of tabs) {
-                tab.classList.remove('active');
-            }
-            
-            for (let content of tabContents) {
-                content.classList.remove('active');
-            }
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
             
             document.querySelector(`.tab[onclick="openTab('${tabName}')"]`).classList.add('active');
             document.getElementById(tabName).classList.add('active');
         }
 
-        // Todo List
+        // Todo List (Intentions)
         let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let currentEmotion = 'neutral';
         
         function renderTasks() {
             const taskList = document.getElementById('taskList');
             taskList.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                taskList.innerHTML = '<li style="color:#666; font-style:italic;">No intentions set yet</li>';
+                return;
+            }
             
             tasks.forEach((task, index) => {
                 const li = document.createElement('li');
@@ -197,8 +345,9 @@
         
         function addTask() {
             const taskInput = document.getElementById('taskInput');
-            if (taskInput.value.trim()) {
-                tasks.push({ text: taskInput.value.trim(), completed: false });
+            const taskText = taskInput.value.trim();
+            if (taskText) {
+                tasks.push({ text: taskText, completed: false });
                 localStorage.setItem('tasks', JSON.stringify(tasks));
                 taskInput.value = '';
                 renderTasks();
@@ -211,7 +360,7 @@
             renderTasks();
         }
         
-        // Pomodoro Timer
+        // Pomodoro Timer (Focus Sessions)
         let timer;
         let timeLeft = 25 * 60; // 25 minutes in seconds
         let isRunning = false;
@@ -234,7 +383,8 @@
                     if (timeLeft <= 0) {
                         clearInterval(timer);
                         isRunning = false;
-                        alert(isWorkTime ? "Time for a break!" : "Break over - back to work!");
+                        const message = isWorkTime ? "Time for a break! 🌿" : "Break over - back to work! 💪";
+                        alert(message);
                         isWorkTime = !isWorkTime;
                         document.getElementById('mode').textContent = isWorkTime ? "Work" : "Break";
                         timeLeft = isWorkTime ? 25 * 60 : 5 * 60;
@@ -260,9 +410,10 @@
         
         // Habits Tracker
         let habits = JSON.parse(localStorage.getItem('habits')) || [
-            { name: 'Exercise', days: [false, false, false, false, false, false, false] },
-            { name: 'Read', days: [false, false, false, false, false, false, false] },
-            { name: 'Meditate', days: [false, false, false, false, false, false, false] }
+            { name: 'Morning Water', days: [false, false, false, false, false, false, false] },
+            { name: 'Movement', days: [false, false, false, false, false, false, false] },
+            { name: 'Mindful Moment', days: [false, false, false, false, false, false, false] },
+            { name: 'Digital Sunset', days: [false, false, false, false, false, false, false] }
         ];
         
         function renderHabits() {
@@ -270,18 +421,18 @@
             habitsGrid.innerHTML = '';
             
             // Add header row
-            habitsGrid.appendChild(createHabitHeader('Habit'));
+            habitsGrid.appendChild(createHabitHeader('Habit', 'habit-name-header'));
             for (let i = 0; i < 7; i++) {
                 habitsGrid.appendChild(createHabitHeader(getDayName(i)));
             }
             
             // Add habit rows
             habits.forEach((habit, habitIndex) => {
-                habitsGrid.appendChild(createHabitHeader(habit.name));
+                habitsGrid.appendChild(createHabitHeader(habit.name, 'habit-name-header'));
                 
                 habit.days.forEach((completed, dayIndex) => {
                     const dayCell = document.createElement('div');
-                    dayCell.className = `habit-day ${completed ? 'completed' : ''}`;
+                    dayCell.className = `habit-day ${completed ? 'completed' : ''} ${dayIndex === new Date().getDay() ? 'today' : ''}`;
                     dayCell.textContent = completed ? '✓' : '';
                     dayCell.onclick = () => toggleHabitDay(habitIndex, dayIndex);
                     habitsGrid.appendChild(dayCell);
@@ -289,9 +440,9 @@
             });
         }
         
-        function createHabitHeader(text) {
+        function createHabitHeader(text, extraClass = '') {
             const header = document.createElement('div');
-            header.className = 'habit-header';
+            header.className = `habit-header ${extraClass}`;
             header.textContent = text;
             return header;
         }
@@ -307,15 +458,104 @@
             renderHabits();
         }
         
+        // Journal Functions
+        const journalPrompts = [
+            "What are you grateful for today?",
+            "What challenged you today?",
+            "What did you learn about yourself?",
+            "How can you be kind to yourself tomorrow?",
+            "What brought you joy today?",
+            "What would make tomorrow meaningful?"
+        ];
+        
+        function getRandomPrompt() {
+            return journalPrompts[Math.floor(Math.random() * journalPrompts.length)];
+        }
+        
+        function setEmotion(emotion) {
+            currentEmotion = emotion;
+            // Update button styles
+            document.querySelectorAll('.emotion-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById(`${emotion}-btn`).classList.add('selected');
+        }
+        
+        function saveJournalEntry() {
+            const entryText = document.getElementById('journal-entry').value.trim();
+            if (entryText) {
+                const entry = {
+                    date: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }),
+                    prompt: document.getElementById('journal-prompt').textContent,
+                    text: entryText,
+                    emotion: currentEmotion
+                };
+                
+                // Save to localStorage
+                let entries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+                entries.push(entry);
+                localStorage.setItem('journalEntries', JSON.stringify(entries));
+                
+                // Clear and refresh
+                document.getElementById('journal-entry').value = '';
+                document.getElementById('journal-prompt').textContent = getRandomPrompt();
+                loadPastEntries();
+            }
+        }
+        
+        function loadPastEntries() {
+            const entries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+            const container = document.getElementById('past-entries');
+            container.innerHTML = '<h3 style="margin-bottom: 15px;">Past Reflections</h3>';
+            
+            if (entries.length === 0) {
+                container.innerHTML += '<p style="color:#666; font-style:italic;">No reflections yet</p>';
+                return;
+            }
+            
+            entries.slice().reverse().forEach(entry => {
+                const div = document.createElement('div');
+                div.className = 'journal-entry';
+                div.innerHTML = `
+                    <div class="journal-date">${entry.date}</div>
+                    <p><em>${entry.prompt}</em></p>
+                    <p>${entry.text}</p>
+                    <div class="journal-emotion">${getEmoji(entry.emotion)} ${entry.emotion.charAt(0).toUpperCase() + entry.emotion.slice(1)}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function getEmoji(emotion) {
+            const emojis = { happy: '😊', neutral: '😐', sad: '😞' };
+            return emojis[emotion] || '😐';
+        }
+        
+        // Morning/Night Mode Toggle
+        function toggleMode() {
+            const body = document.body;
+            const toggleBtn = document.querySelector('.mode-toggle');
+            
+            if (body.classList.contains('morning-mode')) {
+                body.classList.remove('morning-mode');
+                body.classList.add('night-mode');
+                toggleBtn.textContent = '☀️';
+            } else {
+                body.classList.remove('night-mode');
+                body.classList.add('morning-mode');
+                toggleBtn.textContent = '🌙';
+            }
+        }
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             renderTasks();
             updateTimerDisplay();
             renderHabits();
+            loadPastEntries();
+            document.getElementById('journal-prompt').textContent = getRandomPrompt();
+            setEmotion('neutral'); // Default emotion
             
             // Set current day in habits
             const today = new Date().getDay();
-            document.querySelector(`.habit-header:nth-child(${today + 2})`).style.backgroundColor = '#ffd166';
         });
     </script>
 </body>
